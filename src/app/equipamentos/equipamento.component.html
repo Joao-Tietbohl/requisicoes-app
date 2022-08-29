@@ -1,1 +1,125 @@
-<p>equipamento works!</p>
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-10 col-lg-9 mx-auto mt-5">
+      <div class="text-center text-md-start">
+        <h1 class="fw-bold text-primary">Equipamentos</h1>
+      </div>
+
+      <div class="d-grid gap-2 d-md-block my-4">
+        <button
+          (click)="gravar(modal)"
+          type="button" class="btn btn-primary me-md-1 col-md-2">
+          <i class="pi pi-user-plus me-2"></i>Novo
+        </button>
+        <a
+          role="button"
+          class="btn btn-outline-primary col-md-2"
+          routerLink="/painel">
+          <i class="pi pi-sign-out me-2"></i>Voltar
+        </a>
+      </div>
+
+      <div class="mt-4">
+        <table class="table table-light table-striped table-hover">
+          <thead class="thead-dark text-center">
+            <tr>
+              <th>Nº de Série</th>
+              <th>Nome</th>
+              <th>Preço</th>
+              <th>Data de Fabricação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody class="text-center">
+            <tr *ngFor="let equipamento of (equipamentos$ | async)">
+              <td>{{equipamento.numeroDeSerie}}</td>
+              <td>{{equipamento.nome}}</td>
+              <td>{{equipamento.preco}}</td>
+              <td>{{equipamento.dataFabricacao}}</td>
+              <td class="d-grid d-md-block">
+                <button
+                 (click)="gravar(modal, equipamento)"
+                  type="button"
+                  class="btn btn-primary me-0 me-md-1 mb-1 mb-md-auto">
+                  <i class="pi pi-user-edit"></i>
+                </button>
+
+                <button
+                (click)="excluir(modalExclusao, equipamento)"
+                  type="button"
+                  class="btn btn-outline-danger">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{ tituloModal }} de Equipamentos</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('fechar')"></button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="modal.close('gravar')">
+    <div class="modal-body">
+
+      <div class="form-group mb-3">
+        <label for="numeroDeSerie" class="form-label">Numero de série do equipamento</label>
+        <input formControlName = "numeroDeSerie"
+        class="form-control"
+        type="text"
+        placeholder="Digite o numero de série do equipamento">
+    </div>
+
+      <div class="form-group mb-3">
+          <label for="nome" class="form-label">Nome do equipamento</label>
+          <input formControlName = "nome"
+          class="form-control"
+          type="text"
+          placeholder="Digite o nome do departamento">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="preco" class="form-label">Preço do equipamento</label>
+        <input formControlName = "preco"
+        class="form-control"
+        type="number"
+        placeholder="Digite o preço do equipamento">
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="dataFabricacao" class="form-label">Data de fabricação do equipamento</label>
+      <input formControlName = "dataFabricacao"
+      class="form-control"
+      type="Date"
+      placeholder="Digite a data de fabricação do equipamento">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-primary col-md-3" (click)="modal.dismiss('fechar')">Cancelar</button>
+    <button type="submit" class="btn btn-primary col-md-3">Gravar</button>
+  </div>
+</form>
+</ng-template>
+
+<ng-template #modalExclusao let-modalExclusao>
+  <div class="modal-header">
+    <h4 class="modal-title">Exclusão de Equipamentos</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalExclusao.dismiss('fechar')"></button>
+  </div>
+
+  <div class="modal-body">
+    <p>Deseja realmente excluir este equipamento?</p>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-primary col-md-3" (click)="modalExclusao.dismiss('fechar')">Cancelar</button>
+    <button type="button" class="btn btn-danger col-md-3" (click)="modalExclusao.close('excluir')">Excluir</button>
+  </div>
+
+</ng-template>
+
