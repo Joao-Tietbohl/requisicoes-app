@@ -1,9 +1,11 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Departamento } from './models/departamento.model';
 import { DepartamentoService } from './services/departamento.service';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-departamento',
@@ -17,6 +19,7 @@ export class DepartamentoComponent implements OnInit {
     private departamentoService: DepartamentoService,
     private modalService: NgbModal,
     private fb: FormBuilder,
+    private toastr: ToastrService,
     ) {
 
   }
@@ -26,8 +29,8 @@ export class DepartamentoComponent implements OnInit {
 
     this.form = this.fb.group({
       id: new FormControl(""),
-      nome: new FormControl(""),
-      telefone: new FormControl("")
+      nome: new FormControl("", [Validators.required, Validators.minLength(3)]),
+      telefone: new FormControl("", [Validators.required])
     })
   }
 
@@ -57,16 +60,20 @@ export class DepartamentoComponent implements OnInit {
 
       await this.modalService.open(modal).result;
 
-      if(!departamento)
+      if(!departamento){
         await this.departamentoService.inserir(this.form.value);
-      else
+        this.toastr.success("Departamento inserido com sucesso!");
+      }
+      else{
         await this.departamentoService.editar(this.form.value);
-
+        this.toastr.success("Departamento editado com sucesso!");
+      }
         console.log(`O departamento foi salvo com sucesso`);
 
 
     } catch (error) {
-      console.log(error);
+      if(error != "fechar" && error != "0" && error != "1")
+        this.toastr.error("Houve um erro ao salvar o departamento. Tente novamente.")
 
     }
   }
@@ -78,9 +85,12 @@ export class DepartamentoComponent implements OnInit {
       await this.modalService.open(modal).result
 
       this.departamentoService.excluir(departamento);
+      this.toastr.success("Departamento excluído com sucesso!");
+
 
     } catch (error) {
-      console.log(error);
+      if(error != "fechar" && error != "0" && error != "1")
+        this.toastr.error("Houve um erro ao excluir o departamento. Tente novamente.")
 
     }
 

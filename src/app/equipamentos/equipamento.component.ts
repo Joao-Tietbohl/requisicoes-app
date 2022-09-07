@@ -1,6 +1,7 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { Equipamento } from './models/equipamento.model';
 import { EquipamentoService } from './services/equipamento.service';
@@ -17,6 +18,7 @@ export class EquipamentoComponent implements OnInit {
     private equipamentoService: EquipamentoService,
     private modalService: NgbModal,
     private fb: FormBuilder,
+    private toastr: ToastrService,
   ) { }
 
   ngOnInit(): void {
@@ -24,10 +26,10 @@ export class EquipamentoComponent implements OnInit {
 
     this.form = this.fb.group({
       id: new FormControl(""),
-      numeroDeSerie: new FormControl(""),
-      nome: new FormControl(""),
-      preco: new FormControl(""),
-      dataFabricacao: new FormControl(""),
+      numeroDeSerie: new FormControl("", [Validators.required, Validators.minLength(3)]),
+      nome: new FormControl("", [Validators.required, Validators.minLength(3)]),
+      preco: new FormControl("", [Validators.required, Validators.min(1)]),
+      dataFabricacao: new FormControl("", [Validators.required]),
     })
   }
 
@@ -65,16 +67,21 @@ export class EquipamentoComponent implements OnInit {
 
       await this.modalService.open(modal).result;
 
-      if(!equipamento)
+      if(!equipamento){
         await this.equipamentoService.inserir(this.form.value);
+        this.toastr.success("Equipamento inserido com sucesso!");
+      }
       else
+      {
         await this.equipamentoService.editar(this.form.value);
-
+        this.toastr.success("Equipamento editado com sucesso!");
+      }
         console.log(`O equipamento foi salvo com sucesso`);
 
 
     } catch (error) {
-      console.log(error);
+      if(error != "fechar" && error != "0" && error != "1")
+        this.toastr.error("Houve um erro ao salvar o equipamento. Tente novamente.")
 
     }
   }
@@ -86,10 +93,12 @@ export class EquipamentoComponent implements OnInit {
       await this.modalService.open(modal).result
 
       this.equipamentoService.excluir(equipamento);
+      this.toastr.success("Equipamento excluído com sucesso!");
+
 
     } catch (error) {
-      console.log(error);
-
+      if(error != "fechar" && error != "0" && error != "1")
+        this.toastr.error("Houve um erro ao excluir o equipamento. Tente novamente.")
     }
 
   }

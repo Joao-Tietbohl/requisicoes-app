@@ -38,6 +38,6 @@ export class EquipamentoService {
 
   public selecionarTodos(): Observable<Equipamento[]> {
     return this.registros.valueChanges();
-   }
+     }
 
 }
