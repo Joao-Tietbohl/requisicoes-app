@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { map, Observable } from 'rxjs';
+import { map, Observable, take } from 'rxjs';
 import { Departamento } from 'src/app/departamentos/models/departamento.model';
 import { Equipamento } from 'src/app/equipamentos/models/equipamento.model';
 import { Funcionario } from 'src/app/funcionarios/models/funcionario.model';
@@ -50,16 +50,14 @@ public excluir(registro: Requisicao): Promise<void> {
         .collection<Departamento>("departamentos")
         .doc(requisicao.departamentoId)
         .valueChanges()
-        .subscribe(x => requisicao.departamento = x
-          )
+        .subscribe(x => requisicao.departamento = x)
 
         if(requisicao.equipamentoId){
         this.firestore
         .collection<Equipamento>("equipamentos")
         .doc(requisicao.equipamentoId)
         .valueChanges()
-        .subscribe(x => requisicao.equipamento = x
-          )
+        .subscribe(x => requisicao.equipamento = x)
         }
 
         this.firestore
@@ -69,11 +67,29 @@ public excluir(registro: Requisicao): Promise<void> {
         .subscribe(x => requisicao.funcionario = x)
       });
 
-      console.log(requisicoes);
-
       return requisicoes;
     })
   )
+   }
+
+   public SelecionarRequisicoesDepartamentoPorId(departamentoId: string) {
+    return this.selecionarTodos()
+    .pipe(
+      map(requisicoes => {
+        return requisicoes.filter(req => req.departamentoId === departamentoId)
+      })
+    )
+
+   }
+
+   public selecionarPorId(id: string): Observable<Requisicao> {
+    return this.selecionarTodos()
+      .pipe(
+        take(1),
+        map(requisicoes => {
+          return requisicoes.filter(req => req.id === id)[0];
+        })
+      );
    }
 
 }
